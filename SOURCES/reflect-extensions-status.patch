@@ -1,0 +1,51 @@
+From 3efa6fff00f812a034180d3d980a50cfa9a3250b Mon Sep 17 00:00:00 2001
+From: Carlos Soriano <csoriano@redhat.com>
+Date: Tue, 23 Apr 2019 15:16:17 +0200
+Subject: [PATCH] Reflect extension status in the UI
+
+---
+ gtweak/gshellwrapper.py                       | 3 ++-
+ gtweak/tweaks/tweak_group_shell_extensions.py | 6 ++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/gtweak/gshellwrapper.py b/gtweak/gshellwrapper.py
+index d654f88..ef1873a 100644
+--- a/gtweak/gshellwrapper.py
++++ b/gtweak/gshellwrapper.py
+@@ -81,7 +81,8 @@ class GnomeShell:
+ 
+     EXTENSION_TYPE = {
+         "SYSTEM"        :   1,
+-        "PER_USER"      :   2
++        "PER_USER"      :   2,
++        "SESSION_MODE"  :   3
+     }
+ 
+     DATA_DIR = os.path.join(GLib.get_user_data_dir(), "gnome-shell")
+diff --git a/gtweak/tweaks/tweak_group_shell_extensions.py b/gtweak/tweaks/tweak_group_shell_extensions.py
+index e295d0b..5769774 100644
+--- a/gtweak/tweaks/tweak_group_shell_extensions.py
++++ b/gtweak/tweaks/tweak_group_shell_extensions.py
+@@ -114,7 +114,8 @@ class _ShellExtensionTweak(Gtk.ListBoxRow, Tweak):
+         if state == GnomeShell.EXTENSION_STATE["ENABLED"] or \
+            state == GnomeShell.EXTENSION_STATE["DISABLED"] or \
+            state == GnomeShell.EXTENSION_STATE["INITIALIZED"]:
+-            sensitive = True
++            if ext.get("type") != GnomeShell.EXTENSION_TYPE["SESSION_MODE"]:
++                sensitive = True
+         elif state == GnomeShell.EXTENSION_STATE["DOWNLOADING"]:
+             info = _("Extension downloading")
+         elif state == GnomeShell.EXTENSION_STATE["ERROR"]:
+@@ -145,7 +146,8 @@ class _ShellExtensionTweak(Gtk.ListBoxRow, Tweak):
+         sw = Gtk.Switch(sensitive=sensitive)
+         sw.props.vexpand = False
+         sw.props.valign = Gtk.Align.CENTER
+-        sw.set_active(self._shell.extension_is_active(state, uuid))
++        sw.set_active(self._shell.extension_is_active(state, uuid) or
++                      ext.get("type") == GnomeShell.EXTENSION_TYPE["SESSION_MODE"])
+         sw.connect('notify::active', self._on_extension_toggled, uuid)
+         self.hbox.pack_start(sw, False, False, 0)
+ 
+--
+libgit2 0.26.0
+
