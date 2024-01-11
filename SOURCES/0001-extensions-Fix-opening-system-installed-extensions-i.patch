@@ -1,0 +1,30 @@
+From ca3581fe34030438c323b7da6b6d08abcd4d391d Mon Sep 17 00:00:00 2001
+From: Kalev Lember <klember@redhat.com>
+Date: Mon, 19 Nov 2018 11:06:30 +0100
+Subject: [PATCH] extensions: Fix opening system installed extensions in
+ gnome-software
+
+When generating the app id that's passed to gnome-software, avoid
+hardcoding the 'user' scope and use 'system' scope for system-wide
+installed shell extensions.
+---
+ gtweak/tweaks/tweak_group_shell_extensions.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gtweak/tweaks/tweak_group_shell_extensions.py b/gtweak/tweaks/tweak_group_shell_extensions.py
+index 47854a7..284e6e0 100644
+--- a/gtweak/tweaks/tweak_group_shell_extensions.py
++++ b/gtweak/tweaks/tweak_group_shell_extensions.py
+@@ -88,7 +88,8 @@ class _ShellExtensionTweak(Gtk.ListBoxRow, Tweak):
+         self._shell = shell
+         state = ext.get("state")
+         uuid = ext["uuid"]
+-        self._app_id = "user/*/extensions-web/shell-extension/" + uuid.replace('@', '_') + "/*"
++        scope = "user" if ext.get("type") == GnomeShell.EXTENSION_TYPE["PER_USER"] else "system"
++        self._app_id = scope + "/*/*/shell-extension/" + uuid.replace('@', '_') + "/*"
+ 
+         shell._settings.bind("disable-user-extensions", self,
+                              "sensitive", Gio.SettingsBindFlags.INVERT_BOOLEAN)
+-- 
+2.19.1
+

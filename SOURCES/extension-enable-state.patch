@@ -1,0 +1,13 @@
+diff -up gnome-tweaks-3.28.1/gtweak/gshellwrapper.py.orig gnome-tweaks-3.28.1/gtweak/gshellwrapper.py
+--- gnome-tweaks-3.28.1/gtweak/gshellwrapper.py.orig	2020-02-18 11:52:27.943003986 +0100
++++ gnome-tweaks-3.28.1/gtweak/gshellwrapper.py	2020-02-18 11:53:13.572003355 +0100
+@@ -123,8 +123,7 @@ class GnomeShell32(GnomeShell):
+         return self._proxy.proxy.ListExtensions()
+ 
+     def extension_is_active(self, state, uuid):
+-        return state == GnomeShell.EXTENSION_STATE["ENABLED"] and \
+-                self._settings.setting_is_in_list(self.EXTENSION_ENABLED_KEY, uuid)
++        return self._settings.setting_is_in_list(self.EXTENSION_ENABLED_KEY, uuid)
+ 
+     def enable_extension(self, uuid):
+         self._settings.setting_add_to_list(self.EXTENSION_ENABLED_KEY, uuid)

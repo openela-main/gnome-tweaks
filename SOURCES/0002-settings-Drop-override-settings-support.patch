@@ -1,0 +1,53 @@
+From 000396a7ac3f03b0cea1c7897819634edd9f2dd4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Florian=20M=C3=BCllner?= <fmuellner@gnome.org>
+Date: Wed, 18 Jul 2018 17:09:05 +0200
+Subject: [PATCH] settings: Drop override settings support
+
+Now that session-specific overrides landed in GIO, it is no longer
+necessary to explicitly handle different defaults in GNOME and Classic.
+
+https://gitlab.gnome.org/GNOME/gnome-tweaks/merge_requests/9
+---
+ gtweak/widgets.py | 23 -----------------------
+ 1 file changed, 23 deletions(-)
+
+diff --git a/gtweak/widgets.py b/gtweak/widgets.py
+index 3d48a51..f1d607c 100644
+--- a/gtweak/widgets.py
++++ b/gtweak/widgets.py
+@@ -116,32 +116,9 @@ def build_tight_button(stock_id):
+     button.get_style_context().add_provider(provider, 600)
+     return button
+ 
+-def adjust_schema_for_overrides(originalSchema, key, options):
+-    if (_shell is None):
+-        return originalSchema
+-
+-    if (_shell.mode == 'user'):
+-        overridesSchema = "org.gnome.shell.overrides"
+-        overridesFile = "org.gnome.shell.gschema.xml"
+-    elif (_shell.mode == 'classic'):
+-        overridesSchema = "org.gnome.shell.extensions.classic-overrides"
+-        overridesFile = None
+-    else:
+-        return originalSchema
+-
+-    try:
+-        if (key in GSettingsSetting(overridesSchema, schema_filename=overridesFile).list_keys()):
+-            options['schema_filename'] = overridesFile
+-            return overridesSchema
+-    except GSettingsMissingError as e:
+-        logging.info("GSetting missing %s", e)
+-
+-    return originalSchema
+-
+ 
+ class _GSettingsTweak(Tweak):
+     def __init__(self, name, schema_name, key_name, **options):
+-        schema_name = adjust_schema_for_overrides(schema_name, key_name, options)
+         self.schema_name = schema_name
+         self.key_name = key_name
+         self._extra_info = None
+-- 
+2.21.0
+
